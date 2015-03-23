@@ -13,9 +13,17 @@ void List::write(std::ostream &os) const
     os << "(";
     for (auto it = iterator(); !it->is_done(); it->next())
     {
-        os << it->get();
-        if (!it->is_last())
+        if (it->is_last())
         {
+            if (!is_last_empty())
+            {
+                os << ". ";
+            }
+            os << it->get();
+        }
+        else
+        {
+            os << it->get();
             os << " ";
         }
     }
@@ -43,12 +51,12 @@ LinkedList::LinkedList(std::list<std::shared_ptr<Object>> &items, bool is_last_e
 {
 }
 
-std::shared_ptr<Object> LinkedList::car()
+std::shared_ptr<Object> LinkedList::car() const
 {
     return m_items.front();
 }
 
-std::shared_ptr<Object> LinkedList::cdr()
+std::shared_ptr<Object> LinkedList::cdr() const
 {
     if (m_items.size() == 0)
     {
@@ -75,6 +83,9 @@ std::shared_ptr<Object> LinkedList::eval(std::shared_ptr<Environment> env)
     if ((obj = eval_cond(env)) != nullptr) return obj;
     if ((obj = eval_define(env)) != nullptr) return obj;
     if ((obj = eval_lambda(env)) != nullptr) return obj;
+    if ((obj = eval_cons(env)) != nullptr) return obj;
+    if ((obj = eval_car()) != nullptr) return obj;
+    if ((obj = eval_cdr()) != nullptr) return obj;
     if ((obj = eval_function(env)) != nullptr) return obj;
     throw Error("can't eval list");
 }
@@ -236,6 +247,44 @@ std::shared_ptr<Object> LinkedList::eval_function(std::shared_ptr<Environment> e
     return lisp::eval(env, op)->apply(args);
 }
 
+std::shared_ptr<Object> LinkedList::eval_cons(std::shared_ptr<Environment> env) const
+{
+    if (!(m_items.size() == 3)) return nullptr;
+    auto it = m_items.begin();
+    auto op = *it;
+    it++;
+    auto fst = *it;
+    it++;
+    auto snd = *it;
+    if (!(op->type() == Type::Symbol)) return nullptr;
+    if (!(get_symbol(op) == "cons")) return nullptr;
+    return lisp::cons(lisp::eval(env, fst), lisp::eval(env, snd));
+}
+
+std::shared_ptr<Object> LinkedList::eval_car() const
+{
+    if (!(m_items.size() == 2)) return nullptr;
+    auto it = m_items.begin();
+    auto op = *it;
+    it++;
+    auto list = *it;
+    if (!(op->type() == Type::Symbol)) return nullptr;
+    if (!(get_symbol(op) == "car")) return nullptr;
+    return car();
+}
+
+std::shared_ptr<Object> LinkedList::eval_cdr() const
+{
+    if (!(m_items.size() == 2)) return nullptr;
+    auto it = m_items.begin();
+    auto op = *it;
+    it++;
+    auto list = *it;
+    if (!(op->type() == Type::Symbol)) return nullptr;
+    if (!(get_symbol(op) == "cdr")) return nullptr;
+    return cdr();
+}
+
 Empty::Empty()
 {
 }
@@ -246,12 +295,12 @@ std::shared_ptr<Object> Empty::get()
     return singleton;
 }
 
-std::shared_ptr<Object> Empty::car()
+std::shared_ptr<Object> Empty::car() const
 {
     throw Error("can't car empty list");
 }
 
-std::shared_ptr<Object> Empty::cdr()
+std::shared_ptr<Object> Empty::cdr() const
 {
     throw Error("can't cdr empty list");
 }
@@ -323,7 +372,7 @@ std::shared_ptr<Object> cons(std::shared_ptr<Object> car, std::shared_ptr<Object
         return std::shared_ptr<LinkedList>(new LinkedList(items, list->is_last_empty()));
     }
     std::list<std::shared_ptr<Object>> items = { car, cdr };
-    return std::shared_ptr<LinkedList>(new LinkedList(items));
+    return std::shared_ptr<LinkedList>(new LinkedList(items, false));
 }
 
 }

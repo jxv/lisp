@@ -222,7 +222,14 @@ std::shared_ptr<Object> Parser::parse_tokens()
             list.push_back(obj);
         }
         m_tokens.pop_front();
-        return std::shared_ptr<Object>(new lisp::LinkedList(list));
+        if (list.size() == 0)
+        {
+            return std::shared_ptr<Object>(lisp::Empty::get());
+        }
+        else
+        {
+            return std::shared_ptr<Object>(new lisp::LinkedList(list));
+        }
     }
     if (token == ")")
     {
