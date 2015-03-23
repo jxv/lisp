@@ -26,6 +26,7 @@ enum class Type
     Sequence,
     I32,
     F32,
+    UD,
 };
 
 class Object
@@ -34,6 +35,7 @@ public:
     virtual void write(std::ostream &) const = 0;
     virtual void display(std::ostream &) const;
     virtual Type type() const = 0;
+    virtual const std::string &ud_type() const;
     virtual std::shared_ptr<Object> eval(std::shared_ptr<Environment>);
     virtual std::shared_ptr<Object> apply(std::shared_ptr<Object>);
 };

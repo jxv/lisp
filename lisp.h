@@ -8,25 +8,21 @@
 #include "lisp/function.h"
 #include "lisp/list.h"
 #include "lisp/object.h"
+#include "lisp/parser.h"
+#include "lisp/prelude.h"
 #include "lisp/sequence.h"
 #include "lisp/string.h"
 #include "lisp/symbol.h"
 #include "lisp/void.h"
-#include "lisp/parser.h"
 
 /*
- *
  * atom
  * eq
  * car
  * cdr
  * cons
- *
  * quote
- * cond
- * lambda
  * label
- *
  */
 
 #endif // LISP_H

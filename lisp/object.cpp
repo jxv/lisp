@@ -11,6 +11,11 @@ void Object::display(std::ostream &os) const
     os << *this;
 }
 
+const std::string &Object::ud_type() const
+{
+    throw Error("not a user-defined type");
+}
+
 std::shared_ptr<Object> Object::eval(std::shared_ptr<Environment>)
 {
     std::string msg = "can't eval: \'";
