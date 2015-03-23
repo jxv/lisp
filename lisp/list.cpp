@@ -98,9 +98,13 @@ bool LinkedList::is_last_empty() const
 std::shared_ptr<Object> LinkedList::eval_quote() const
 {
     if (!(m_items.size() == 2)) return nullptr;
-    if (!(m_items.front()->type() == Type::Symbol)) return nullptr;
-    if (!(to_symbol(m_items.front())->name() == "quote")) return nullptr;
-    return m_items.back();
+    auto it = m_items.begin();
+    auto op = *it;
+    it++;
+    auto list = *it;
+    if (!(op->type() == Type::Symbol)) return nullptr;
+    if (!(get_symbol(op) == "quote")) return nullptr;
+    return list;
 }
 
 std::shared_ptr<Object> LinkedList::eval_set(std::shared_ptr<Environment> env) const
