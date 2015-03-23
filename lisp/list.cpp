@@ -112,10 +112,10 @@ std::shared_ptr<Object> LinkedList::eval_quote() const
     auto it = m_items.begin();
     auto op = *it;
     it++;
-    auto list = *it;
+    auto obj = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
     if (!(get_symbol(op) == "quote")) return nullptr;
-    return list;
+    return obj;
 }
 
 std::shared_ptr<Object> LinkedList::eval_set(std::shared_ptr<Environment> env) const
