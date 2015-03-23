@@ -206,7 +206,7 @@ std::shared_ptr<lisp::Object> not_(std::shared_ptr<lisp::Object> obj)
 std::shared_ptr<lisp::Object> and_(std::shared_ptr<lisp::Object> obj)
 {
     auto args = lisp::List::to(obj);
-    if (args->size() < 2)
+    if (args->size() < 1)
     {
         throw lisp::Error::with_object("and: needs 2 or more args: ", *obj);
     }
@@ -224,7 +224,7 @@ std::shared_ptr<lisp::Object> and_(std::shared_ptr<lisp::Object> obj)
 std::shared_ptr<lisp::Object> or_(std::shared_ptr<lisp::Object> obj)
 {
     auto args = lisp::List::to(obj);
-    if (args->size() < 2)
+    if (args->size() < 1)
     {
         throw lisp::Error::with_object("or: needs 2 or more args: ", *obj);
     }
@@ -261,7 +261,7 @@ std::shared_ptr<lisp::Environment> prelude()
     def_cpp_fn(env, "<=", less_than_or_equal);
     def_cpp_fn(env, "not", not_);
     def_cpp_fn(env, "and", and_);
-    def_cpp_fn(env, "or", and_);
+    def_cpp_fn(env, "or", or_);
     def_cpp_fn(env, "round", round_i32);
     return env;
 }
