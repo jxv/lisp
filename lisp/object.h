@@ -18,6 +18,7 @@ class Environment;
 enum class Type
 {
     Void,
+    Nil,
     List,
     Symbol,
     Boolean,

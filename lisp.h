@@ -8,6 +8,7 @@
 #include "lisp/function.h"
 #include "lisp/list.h"
 #include "lisp/object.h"
+#include "lisp/nil.h"
 #include "lisp/parser.h"
 #include "lisp/prelude.h"
 #include "lisp/quote.h"
@@ -19,9 +20,7 @@
 /*
  * atom
  * eq
- * car
- * cdr
  * label
- */
+*/
 
 #endif // LISP_H
