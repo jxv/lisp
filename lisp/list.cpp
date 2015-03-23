@@ -84,8 +84,8 @@ std::shared_ptr<Object> LinkedList::eval(std::shared_ptr<Environment> env)
     if ((obj = eval_define(env)) != nullptr) return obj;
     if ((obj = eval_lambda(env)) != nullptr) return obj;
     if ((obj = eval_cons(env)) != nullptr) return obj;
-    if ((obj = eval_car()) != nullptr) return obj;
-    if ((obj = eval_cdr()) != nullptr) return obj;
+    if ((obj = eval_car(env)) != nullptr) return obj;
+    if ((obj = eval_cdr(env)) != nullptr) return obj;
     if ((obj = eval_function(env)) != nullptr) return obj;
     throw Error("can't eval list");
 }
@@ -106,6 +106,11 @@ bool LinkedList::is_last_empty() const
     return m_is_last_empty;
 }
 
+void LinkedList::set_last_empty()
+{
+    m_is_last_empty = true;
+}
+
 std::shared_ptr<Object> LinkedList::eval_quote() const
 {
     if (!(m_items.size() == 2)) return nullptr;
@@ -114,7 +119,7 @@ std::shared_ptr<Object> LinkedList::eval_quote() const
     it++;
     auto obj = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(get_symbol(op) == "quote")) return nullptr;
+    if (!(Symbol::name(op) == "quote")) return nullptr;
     return obj;
 }
 
@@ -128,8 +133,8 @@ std::shared_ptr<Object> LinkedList::eval_set(std::shared_ptr<Environment> env) c
     it++;
     auto body = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(get_symbol(op) == "set!")) return nullptr;
-    return env->set(get_symbol(key), lisp::eval(env, body));
+    if (!(Symbol::name(op) == "set!")) return nullptr;
+    return env->set(Symbol::name(key), lisp::eval(env, body));
 }
 
 std::shared_ptr<Object> LinkedList::eval_if(std::shared_ptr<Environment> env) const
@@ -144,7 +149,7 @@ std::shared_ptr<Object> LinkedList::eval_if(std::shared_ptr<Environment> env) co
     it++;
     auto on_false = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(to_symbol(op)->name() == "if")) return nullptr;
+    if (!(Symbol::name(op) == "if")) return nullptr;
     if (Boolean::value(lisp::eval(env, pred)))
     {
         return lisp::eval(env, lisp::eval(env, on_true));
@@ -161,7 +166,7 @@ std::shared_ptr<Object> LinkedList::eval_cond(std::shared_ptr<Environment> env) 
     auto it = m_items.begin();
     auto op = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(to_symbol(op)->name() == "cond")) return nullptr;
+    if (!(Symbol::name(op) == "cond")) return nullptr;
     it++;
     for (; it != m_items.end(); ++it)
     {
@@ -190,10 +195,10 @@ std::shared_ptr<Object> LinkedList::eval_define(std::shared_ptr<Environment> env
     it++;
     auto body = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(to_symbol(op)->name() == "def")) return nullptr;
+    if (!(Symbol::name(op) == "def")) return nullptr;
     if (key->type() == Type::Symbol) 
     {
-        return env->define(to_symbol(key)->name(), lisp::eval(env, body));
+        return env->define(Symbol::name(key), lisp::eval(env, body));
     }
     else if (key->type() == Type::List)
     {
@@ -210,7 +215,7 @@ std::shared_ptr<Object> LinkedList::eval_define(std::shared_ptr<Environment> env
                 params.push_back(it->get());
             }
             auto lambda = std::shared_ptr<Object>(new Lambda(std::shared_ptr<Object>(new LinkedList(params)), body, env));
-            return env->define(get_symbol(fn), lambda);
+            return env->define(Symbol::name(fn), lambda);
         }
         return nullptr;
     }
@@ -227,7 +232,7 @@ std::shared_ptr<Object> LinkedList::eval_lambda(std::shared_ptr<Environment> env
     it++;
     auto body = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(to_symbol(op)->name() == "lam")) return nullptr;
+    if (!(Symbol::name(op) == "lam")) return nullptr;
     if (!(params->type() == Type::List)) return nullptr;
     return std::shared_ptr<Object>(new Lambda(params, body, env));
 }
@@ -257,11 +262,11 @@ std::shared_ptr<Object> LinkedList::eval_cons(std::shared_ptr<Environment> env) 
     it++;
     auto snd = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(get_symbol(op) == "cons")) return nullptr;
+    if (!(Symbol::name(op) == "cons")) return nullptr;
     return lisp::cons(lisp::eval(env, fst), lisp::eval(env, snd));
 }
 
-std::shared_ptr<Object> LinkedList::eval_car() const
+std::shared_ptr<Object> LinkedList::eval_car(std::shared_ptr<Environment> env) const
 {
     if (!(m_items.size() == 2)) return nullptr;
     auto it = m_items.begin();
@@ -269,11 +274,11 @@ std::shared_ptr<Object> LinkedList::eval_car() const
     it++;
     auto list = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(get_symbol(op) == "car")) return nullptr;
-    return car();
+    if (!(Symbol::name(op) == "car")) return nullptr;
+    return List::to(lisp::eval(env, list))->car();
 }
 
-std::shared_ptr<Object> LinkedList::eval_cdr() const
+std::shared_ptr<Object> LinkedList::eval_cdr(std::shared_ptr<Environment> env) const
 {
     if (!(m_items.size() == 2)) return nullptr;
     auto it = m_items.begin();
@@ -281,12 +286,17 @@ std::shared_ptr<Object> LinkedList::eval_cdr() const
     it++;
     auto list = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(get_symbol(op) == "cdr")) return nullptr;
-    return cdr();
+    if (!(Symbol::name(op) == "cdr")) return nullptr;
+    return List::to(lisp::eval(env, list))->cdr();
 }
 
 Empty::Empty()
 {
+}
+
+void Empty::write(std::ostream &os) const
+{
+    os << "()";
 }
 
 std::shared_ptr<Object> Empty::get()
@@ -323,6 +333,10 @@ std::unique_ptr<Iterator> Empty::iterator() const
 bool Empty::is_last_empty() const
 {
     return false;
+}
+
+void Empty::set_last_empty()
+{
 }
 
 LinkedList_Iterator::LinkedList_Iterator(std::list<std::shared_ptr<Object>>::const_iterator start, std::list<std::shared_ptr<Object>>::const_iterator last)

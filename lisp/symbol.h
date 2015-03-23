@@ -14,12 +14,11 @@ public:
     Type type() const;
     const std::string &name() const;
     std::shared_ptr<Object> eval(std::shared_ptr<Environment>);
+    static std::shared_ptr<Symbol> to(std::shared_ptr<Object> obj);
+    static const std::string &name(std::shared_ptr<Object> obj);
 private:
     const std::string m_name;
 };
-
-std::shared_ptr<Symbol> to_symbol(std::shared_ptr<Object> obj);
-const std::string &get_symbol(std::shared_ptr<Object> obj);
 
 }
 

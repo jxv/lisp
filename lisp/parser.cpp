@@ -12,6 +12,7 @@
 #include "symbol.h"
 #include "boolean.h"
 #include "number.h"
+#include "quote.h"
 
 namespace lisp
 {
@@ -29,6 +30,10 @@ void Parser::step_default(std::string::const_iterator it)
     {
         m_mode = Mode::String;
         return;
+    }
+    else if (ch == '\'' && m_cur_token.empty())
+    {
+        m_tokens.push_back("'");
     }
     else if (ch == '(' || ch == ')')
     {
@@ -231,11 +236,18 @@ std::shared_ptr<Object> Parser::parse_tokens()
             return std::shared_ptr<Object>(new lisp::LinkedList(list));
         }
     }
-    if (token == ")")
+    else if (token == ")")
     {
         throw lisp::Error("non-matching ')'");
     }
-    return parse_atom(token);
+    else if (token == "'")
+    {
+        auto obj = parse_tokens();
+        return std::shared_ptr<Object>(new lisp::Quote(obj));
+    }
+    else {
+        return parse_atom(token);
+    }
 }
 
 std::shared_ptr<Object> Parser::parse()

@@ -34,7 +34,7 @@ std::shared_ptr<Object> Object::apply(std::shared_ptr<Object>)
 std::shared_ptr<Object> eval(std::shared_ptr<Environment> env, std::shared_ptr<Object> obj)
 {
     auto type = obj->type();
-    if (type != Type::Symbol && type != Type::List && type != Type::Sequence)
+    if (type != Type::Symbol && type != Type::List && type != Type::Sequence && type != Type::Quote)
     {
         return obj;
     }

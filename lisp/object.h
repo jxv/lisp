@@ -24,6 +24,7 @@ enum class Type
     Function,
     String,
     Sequence,
+    Quote,
     I32,
     F32,
     UD,

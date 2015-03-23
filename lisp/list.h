@@ -11,7 +11,7 @@ class Iterator;
 class List : public Object
 {
 public:
-    void write(std::ostream &os) const;
+    virtual void write(std::ostream &os) const;
     Type type() const;
     virtual std::shared_ptr<Object> car() const = 0;
     virtual std::shared_ptr<Object> cdr() const = 0;
@@ -19,6 +19,7 @@ public:
     virtual unsigned int size() const = 0;
     virtual std::unique_ptr<lisp::Iterator> iterator() const = 0;
     virtual bool is_last_empty() const = 0;
+    virtual void set_last_empty() = 0;
     static std::shared_ptr<List> to(std::shared_ptr<Object>);
 };
 
@@ -34,12 +35,14 @@ public:
 class Empty : public List
 {
 public:
+    void write(std::ostream &os) const;
     std::shared_ptr<Object> car() const;
     std::shared_ptr<Object> cdr() const;
     std::shared_ptr<Object> eval(std::shared_ptr<Environment> env);
     unsigned int size() const;
     std::unique_ptr<lisp::Iterator> iterator() const;
     bool is_last_empty() const;
+    void set_last_empty();
     static std::shared_ptr<Object> get();
 private:
     Empty();
@@ -56,6 +59,7 @@ public:
     unsigned int size() const;
     std::unique_ptr<lisp::Iterator> iterator() const;
     bool is_last_empty() const;
+    void set_last_empty();
 private:
     std::shared_ptr<Object> eval_quote() const;
     std::shared_ptr<Object> eval_set(std::shared_ptr<Environment> env) const;
@@ -64,8 +68,8 @@ private:
     std::shared_ptr<Object> eval_define(std::shared_ptr<Environment> env) const;
     std::shared_ptr<Object> eval_lambda(std::shared_ptr<Environment> env) const;
     std::shared_ptr<Object> eval_cons(std::shared_ptr<Environment> env) const;
-    std::shared_ptr<Object> eval_car() const;
-    std::shared_ptr<Object> eval_cdr() const;
+    std::shared_ptr<Object> eval_car(std::shared_ptr<Environment> env) const;
+    std::shared_ptr<Object> eval_cdr(std::shared_ptr<Environment> env) const;
     std::shared_ptr<Object> eval_function(std::shared_ptr<Environment> env) const;
 private:
     bool m_is_last_empty;

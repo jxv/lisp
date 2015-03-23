@@ -10,6 +10,7 @@
 #include "lisp/object.h"
 #include "lisp/parser.h"
 #include "lisp/prelude.h"
+#include "lisp/quote.h"
 #include "lisp/sequence.h"
 #include "lisp/string.h"
 #include "lisp/symbol.h"
@@ -20,8 +21,6 @@
  * eq
  * car
  * cdr
- * cons
- * quote
  * label
  */
 

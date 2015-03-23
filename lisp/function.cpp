@@ -62,7 +62,7 @@ Lambda::Lambda(std::shared_ptr<Object> params, std::shared_ptr<Object> body, std
     auto list = List::to(params);
     for (auto it = list->iterator(); !it->is_done(); it->next())
     {
-        m_params.push_back(to_symbol(it->get())->name());
+        m_params.push_back(Symbol::name(it->get()));
     }
 }
 
