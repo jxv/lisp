@@ -48,6 +48,7 @@ std::shared_ptr<Object> Environment::set(const std::string &key, std::shared_ptr
     {
         throw Error(key + " must already be bounded");
     }
+    m_map.erase(key);
     m_map.insert(std::pair<std::string, std::shared_ptr<Object>>(key, obj));
     return obj;
 }

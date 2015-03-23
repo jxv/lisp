@@ -110,14 +110,15 @@ std::shared_ptr<Object> LinkedList::eval_quote() const
 std::shared_ptr<Object> LinkedList::eval_set(std::shared_ptr<Environment> env) const
 {
     if (!(m_items.size() == 3)) return nullptr;
-    auto op = m_items.front();
-    auto key = *(m_items.begin()++);
-    auto value = m_items.back();
+    auto it = m_items.begin();
+    auto op = *it;
+    it++;
+    auto key = *it;
+    it++;
+    auto body = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
-    if (!(to_symbol(op)->name() == "set!")) return nullptr;
-    if (!(key->type() == Type::Symbol)) return nullptr;
-    auto name = to_symbol(key)->name();
-    return env->set(name, value->eval(env));
+    if (!(get_symbol(op) == "set!")) return nullptr;
+    return env->set(get_symbol(key), lisp::eval(env, body));
 }
 
 std::shared_ptr<Object> LinkedList::eval_if(std::shared_ptr<Environment> env) const
