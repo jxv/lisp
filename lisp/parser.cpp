@@ -13,6 +13,7 @@
 #include "boolean.h"
 #include "number.h"
 #include "quote.h"
+#include "sequence.h"
 
 namespace lisp
 {
@@ -294,7 +295,12 @@ std::shared_ptr<Object> Parser::parse()
         }
     }
 
-    return parse_tokens();
+    std::vector<std::shared_ptr<Object>> seq;
+    while (!m_tokens.empty())
+    {
+        seq.push_back(parse_tokens());
+    }
+    return std::shared_ptr<Object>(new Sequence(seq));
 }
 
 }

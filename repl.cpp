@@ -10,7 +10,7 @@ Repl::Repl(std::shared_ptr<lisp::Environment> env)
 {
 }
 
-void Repl::loop()
+int Repl::exec()
 {
     for (;;)
     {
@@ -55,4 +55,5 @@ void Repl::loop()
             std::cout << e.message() << std::endl;
         }
     }
+    return EXIT_SUCCESS;
 }
