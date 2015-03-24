@@ -24,11 +24,15 @@ std::shared_ptr<lisp::Object> print(std::shared_ptr<lisp::Object> obj)
     return lisp::Void::get();
 }
 
-std::shared_ptr<lisp::Object> get_line(std::shared_ptr<lisp::Object>)
+std::shared_ptr<lisp::Object> get_line(std::shared_ptr<lisp::Object> obj)
 {
+    if (lisp::List::to(obj)->size() != 0)
+    {
+        throw lisp::Error("get-line: doesn't take any args");
+    }
     std::string line;
     std::getline(std::cin, line);
-    return std::shared_ptr<lisp::Object>(new lisp::String(line));
+    return std::shared_ptr<lisp::Object>(lisp::String::from_escape_chars(line));
 }
 
 std::shared_ptr<lisp::Object> add(std::shared_ptr<lisp::Object> obj)

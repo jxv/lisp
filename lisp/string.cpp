@@ -10,6 +10,99 @@ String::String(const std::string &v)
 {
 }
 
+std::shared_ptr<String> String::from_escape_chars(const std::string &v)
+{
+    std::string str;
+    // Absolute minimum required size. Will likely still grow.
+    str.reserve(v.size() / 2);
+    bool escape = false;
+    for (auto it = v.cbegin(); it != v.cend(); ++it)
+    {
+        if (!escape)
+        {
+            if (*it == '\\')
+            {
+                escape = true;
+            }
+            else
+            {
+                str.push_back(*it);
+            }
+        }
+        else
+        {
+            switch (*it)
+            {
+            case 'a':
+            {
+                str.push_back('\a');
+                break;
+            }
+            case 'b':
+            {
+                str.push_back('\b');
+                break;
+            }
+            case 'f':
+            {
+                str.push_back('\f');
+                break;
+            }
+            case 'n':
+            {
+                str.push_back('\n');
+                break;
+            }
+            case 'r':
+            {
+                str.push_back('\r');
+                break;
+            }
+            case 't':
+            {
+                str.push_back('\t');
+                break;
+            }
+            case 'v':
+            {
+                str.push_back('\v');
+                break;
+            }
+            case '\\':
+            {
+                str.push_back('\\');
+                break;
+            }
+            case '\'':
+            {
+                str.push_back('\'');
+                break;
+            }
+            case '\"':
+            {
+                str.push_back('\"');
+                break;
+            }
+            case '\?':
+            {
+                str.push_back('\?');
+                break;
+            }
+            default:
+            {
+                throw Error("not escape char");
+            }
+            }
+            escape = false;
+        }
+    }
+    if (escape)
+    {
+        throw Error("expected escape char");
+    }
+    return std::shared_ptr<String>(new String(str));
+}
+
 void String::write(std::ostream &os) const
 {
     os << '"';

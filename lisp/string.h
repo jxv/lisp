@@ -10,6 +10,7 @@ class String : public Object
 {
 public:
     String(const std::string &);
+    static std::shared_ptr<String> from_escape_chars(const std::string &);
     void write(std::ostream &) const;
     void show(std::ostream &) const;
     Type type() const;
