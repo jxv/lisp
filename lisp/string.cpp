@@ -103,7 +103,7 @@ const std::string &String::value() const
     return m_value;
 }
 
-std::shared_ptr<String> to_string(std::shared_ptr<Object> obj)
+std::shared_ptr<String> String::to(std::shared_ptr<Object> obj)
 {
     if (obj->type() != Type::String)
     {
@@ -112,9 +112,9 @@ std::shared_ptr<String> to_string(std::shared_ptr<Object> obj)
     return std::dynamic_pointer_cast<String>(obj);
 }
 
-const std::string &get_string(std::shared_ptr<Object> obj)
+const std::string &String::value(std::shared_ptr<Object> obj)
 {
-    return to_string(obj)->value();
+    return String::to(obj)->value();
 }
 
 }

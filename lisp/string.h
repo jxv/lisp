@@ -14,12 +14,11 @@ public:
     void write(std::ostream &) const;
     Type type() const;
     const std::string &value() const;
+    static std::shared_ptr<String> to(std::shared_ptr<Object> obj);
+    static const std::string &value(std::shared_ptr<Object> obj);
 private:
     const std::string m_value;
 };
-
-std::shared_ptr<String> to_string(std::shared_ptr<Object> obj);
-const std::string &get_string(std::shared_ptr<Object> obj);
 
 }
 
