@@ -10,11 +10,6 @@ String::String(const std::string &v)
 {
 }
 
-void String::display(std::ostream &os) const
-{
-    os << m_value;
-}
-
 void String::write(std::ostream &os) const
 {
     os << '"';
@@ -92,6 +87,12 @@ void String::write(std::ostream &os) const
     }
     os << '"';
 }
+
+void String::show(std::ostream &os) const
+{
+    os << m_value;
+}
+
 
 Type String::type() const
 {

@@ -23,7 +23,7 @@ void Quote::write(std::ostream &os) const
     os << "(quote " << m_object << ")";
 }
 
-void Quote::display(std::ostream &os) const
+void Quote::show(std::ostream &os) const
 {
     os << m_object;
 }

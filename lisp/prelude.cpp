@@ -13,15 +13,22 @@
 namespace lisp
 {
 
-std::shared_ptr<lisp::Object> display(std::shared_ptr<lisp::Object> obj)
+std::shared_ptr<lisp::Object> print(std::shared_ptr<lisp::Object> obj)
 {
     auto args = lisp::List::to(obj);
     if (args->size() != 1)
     {
-        throw lisp::Error::with_object("display: needs 1 arg: ", *obj);
+        throw lisp::Error::with_object("print: needs 1 arg: ", *obj);
     }
-    args->car()->display(std::cout);
+    args->car()->show(std::cout);
     return lisp::Void::get();
+}
+
+std::shared_ptr<lisp::Object> get_line(std::shared_ptr<lisp::Object>)
+{
+    std::string line;
+    std::getline(std::cin, line);
+    return std::shared_ptr<lisp::Object>(new lisp::String(line));
 }
 
 std::shared_ptr<lisp::Object> add(std::shared_ptr<lisp::Object> obj)
@@ -249,7 +256,8 @@ void def_cpp_fn(
 std::shared_ptr<lisp::Environment> prelude()
 {
     auto env = std::shared_ptr<lisp::Environment>(new lisp::Environment);
-    def_cpp_fn(env, "display", display);
+    def_cpp_fn(env, "print", print);
+    def_cpp_fn(env, "get-line", get_line);
     def_cpp_fn(env, "+", add);
     def_cpp_fn(env, "*", multiply);
     def_cpp_fn(env, "-", subtract);

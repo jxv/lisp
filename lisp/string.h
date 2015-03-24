@@ -10,8 +10,8 @@ class String : public Object
 {
 public:
     String(const std::string &);
-    void display(std::ostream &) const;
     void write(std::ostream &) const;
+    void show(std::ostream &) const;
     Type type() const;
     const std::string &value() const;
     static std::shared_ptr<String> to(std::shared_ptr<Object> obj);

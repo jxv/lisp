@@ -6,7 +6,7 @@
 namespace lisp
 {
 
-void Object::display(std::ostream &os) const
+void Object::show(std::ostream &os) const
 {
     os << *this;
 }
