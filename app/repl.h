@@ -1,10 +1,12 @@
-#ifndef REPL_H
-#define REPL_H
+#ifndef APP_REPL_H
+#define APP_REPL_H
 
-#include "lisp.h"
-#include "app.h"
+#include "base.h"
 
-class Repl : public App
+namespace app
+{
+
+class Repl : public Base
 {
 public:
     Repl();
@@ -14,4 +16,6 @@ private:
     std::shared_ptr<lisp::Environment> m_env;
 };
 
-#endif // REPL_H
+}
+
+#endif // APP_REPL_H

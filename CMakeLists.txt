@@ -6,6 +6,8 @@ file(GLOB SOURCE
   "*.cpp"
   "lisp/*.h"
   "lisp/*.cpp"
+  "app/*.h"
+  "app/*.cpp"
 )
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
 add_executable(${PROJECT_NAME} ${SOURCE})

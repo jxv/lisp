@@ -1,10 +1,6 @@
 #ifndef APP_H
 #define APP_H
 
-class App
-{
-public:
-    virtual int exec() = 0;
-};
+#include "app/app.h"
 
 #endif // APP_H

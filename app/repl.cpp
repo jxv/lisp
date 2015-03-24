@@ -1,5 +1,8 @@
 #include "repl.h"
 
+namespace app
+{
+
 Repl::Repl()
     : m_env(lisp::prelude())
 {
@@ -56,4 +59,6 @@ int Repl::exec()
         }
     }
     return EXIT_SUCCESS;
+}
+
 }

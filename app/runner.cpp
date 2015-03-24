@@ -3,6 +3,9 @@
 #include <fstream>
 #include <streambuf>
 
+namespace app
+{
+
 SourceRunner::SourceRunner(const std::string &file_path)
     : SourceRunner(lisp::static_prelude(), file_path)
 {
@@ -38,4 +41,6 @@ int SourceRunner::exec()
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
+}
+
 }

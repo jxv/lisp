@@ -1,10 +1,12 @@
-#ifndef RUNNER_H
-#define RUNNER_H
+#ifndef APP_RUNNER_H
+#define APP_RUNNER_H
 
-#include "lisp.h"
-#include "app.h"
+#include "base.h"
 
-class SourceRunner : public App
+namespace app
+{
+
+class SourceRunner : public Base
 {
 public:
     SourceRunner(const std::string &file_path);
@@ -15,4 +17,6 @@ private:
     std::shared_ptr<lisp::Environment> m_env;
 };
 
-#endif
+}
+
+#endif // APP_RUNNER_H
