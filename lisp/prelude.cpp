@@ -11,268 +11,271 @@
 #include "symbol.h"
 #include "void.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
-std::shared_ptr<lisp::Object> is_null(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> is_null(shared_ptr<Object> obj)
 {
-    auto arg = lisp::List::to(obj)->car();
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(arg == lisp::Empty::get()));
+    auto arg = List::to(obj)->car();
+    return shared_ptr<Object>(new Boolean(arg == Empty::get()));
 }
 
-std::shared_ptr<lisp::Object> is_pair(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> is_pair(shared_ptr<Object> obj)
 {
-    auto arg = lisp::List::to(obj)->car();
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(arg->type() == Type::List));
+    auto arg = List::to(obj)->car();
+    return shared_ptr<Object>(new Boolean(arg->type() == Type::List));
 }
 
-std::shared_ptr<lisp::Object> print(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> print(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 1)
     {
-        throw lisp::Error::with_object("print: needs 1 arg: ", *obj);
+        throw Error::with_object("print: needs 1 arg: ", *obj);
     }
     args->car()->show(std::cout);
-    return lisp::Void::get();
+    return Void::get();
 }
 
-std::shared_ptr<lisp::Object> get_line(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> get_line(shared_ptr<Object> obj)
 {
-    if (lisp::List::to(obj)->size() != 0)
+    if (List::to(obj)->size() != 0)
     {
-        throw lisp::Error("get-line: doesn't take any args");
+        throw Error("get-line: doesn't take any args");
     }
     std::string line;
     std::getline(std::cin, line);
-    return std::shared_ptr<lisp::Object>(lisp::String::from_escape_chars(line));
+    return shared_ptr<Object>(String::from_escape_chars(line));
 }
 
-std::shared_ptr<lisp::Object> add(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> add(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() < 2)
     {
-        throw lisp::Error::with_object("+: needs 2 or more args: ", *obj);
+        throw Error::with_object("+: needs 2 or more args: ", *obj);
     }
     auto it = args->iterator();
     switch (it->get()->type())
     {
-    case lisp::Type::F32:
+    case Type::F32:
     {
         float result = 0;
         for (; !it->is_done(); it->next())
         {
-            result += lisp::F32::value(it->get());
+            result += F32::value(it->get());
         }
-        return std::shared_ptr<lisp::Object>(new lisp::F32(result));
+        return shared_ptr<Object>(new F32(result));
     }
-    case lisp::Type::I32:
+    case Type::I32:
     default:
     {
         int result = 0;
         for (; !it->is_done(); it->next())
         {
-            result += lisp::I32::value(it->get());
+            result += I32::value(it->get());
         }
-        return std::shared_ptr<lisp::Object>(new lisp::I32(result));
+        return shared_ptr<Object>(new I32(result));
     }
     }
 }
 
-std::shared_ptr<lisp::Object> multiply(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> multiply(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() < 2)
     {
-        throw lisp::Error::with_object("*: needs 2 or more args: ", *obj);
+        throw Error::with_object("*: needs 2 or more args: ", *obj);
     }
     int result = 1;
     for (auto it = args->iterator(); !it->is_done(); it->next())
     {
-        result *= lisp::I32::value(it->get());
+        result *= I32::value(it->get());
     }
-    return std::shared_ptr<lisp::Object>(new lisp::I32(result));
+    return shared_ptr<Object>(new I32(result));
 }
 
-std::shared_ptr<lisp::Object> subtract(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> subtract(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() < 2)
     {
-        throw lisp::Error::with_object("-: needs 2 or more args: ", *obj);
+        throw Error::with_object("-: needs 2 or more args: ", *obj);
     }
 
     auto it = args->iterator();
-    int result = lisp::I32::value(it->get());
+    int result = I32::value(it->get());
     it->next();
     for (; !it->is_done(); it->next())
     {
-        result -= lisp::I32::value(it->get());
+        result -= I32::value(it->get());
     }
-    return std::shared_ptr<lisp::Object>(new lisp::I32(result));
+    return shared_ptr<Object>(new I32(result));
 }
 
-std::shared_ptr<lisp::Object> divide(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> divide(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() < 2)
     {
-        throw lisp::Error::with_object("/: needs 2 or more args: ", *obj);
+        throw Error::with_object("/: needs 2 or more args: ", *obj);
     }
 
     auto it = args->iterator();
-    int result = lisp::I32::value(it->get());
+    int result = I32::value(it->get());
     it->next();
     for (; !it->is_done(); it->next())
     {
-        result /= lisp::I32::value(it->get());
+        result /= I32::value(it->get());
     }
-    return std::shared_ptr<lisp::Object>(new lisp::I32(result));
+    return shared_ptr<Object>(new I32(result));
 }
 
-std::shared_ptr<lisp::Object> equal_to(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> equal_to(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 2)
     {
-        throw lisp::Error::with_object("=: needs 2 args: ", *obj);
+        throw Error::with_object("=: needs 2 args: ", *obj);
     }
 
     auto it = args->iterator();
     auto first = it->get();
     it->next();
-    auto result = lisp::I32::value(first) == lisp::I32::value(it->get());
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(result));
+    auto result = I32::value(first) == I32::value(it->get());
+    return shared_ptr<Object>(new Boolean(result));
 }
 
-std::shared_ptr<lisp::Object> greater_than(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> greater_than(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 2)
     {
-        throw lisp::Error::with_object(">: needs 2 args: ", *obj);
+        throw Error::with_object(">: needs 2 args: ", *obj);
     }
 
     auto it = args->iterator();
     auto first = it->get();
     it->next();
-    auto result = lisp::I32::value(first) > lisp::I32::value(it->get());
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(result));
+    auto result = I32::value(first) > I32::value(it->get());
+    return shared_ptr<Object>(new Boolean(result));
 }
 
-std::shared_ptr<lisp::Object> greater_than_or_equal(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> greater_than_or_equal(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 2)
     {
-        throw lisp::Error::with_object(">=: needs 2 args: ", *obj);
+        throw Error::with_object(">=: needs 2 args: ", *obj);
     }
 
     auto it = args->iterator();
     auto first = it->get();
     it->next();
-    auto result = lisp::I32::value(first) >= lisp::I32::value(it->get());
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(result));
+    auto result = I32::value(first) >= I32::value(it->get());
+    return shared_ptr<Object>(new Boolean(result));
 }
 
-std::shared_ptr<lisp::Object> less_than(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> less_than(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 2)
     {
-        throw lisp::Error::with_object("<: needs 2 args: ", *obj);
+        throw Error::with_object("<: needs 2 args: ", *obj);
     }
 
     auto it = args->iterator();
     auto first = it->get();
     it->next();
-    auto result = lisp::I32::value(first) < lisp::I32::value(it->get());
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(result));
+    auto result = I32::value(first) < I32::value(it->get());
+    return shared_ptr<Object>(new Boolean(result));
 }
 
-std::shared_ptr<lisp::Object> less_than_or_equal(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> less_than_or_equal(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 2)
     {
-        throw lisp::Error::with_object("<=: needs 2 args: ", *obj);
+        throw Error::with_object("<=: needs 2 args: ", *obj);
     }
 
     auto it = args->iterator();
     auto first = it->get();
     it->next();
-    auto result = lisp::I32::value(first) <= lisp::I32::value(it->get());
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(result));
+    auto result = I32::value(first) <= I32::value(it->get());
+    return shared_ptr<Object>(new Boolean(result));
 }
 
-std::shared_ptr<lisp::Object> round_i32(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> round_i32(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 1)
     {
-        throw lisp::Error::with_object("round: needs 1 arg: ", *args->car());
+        throw Error::with_object("round: needs 1 arg: ", *args->car());
     }
-    auto result = roundf(lisp::F32::value(args->car()));
-    return std::shared_ptr<lisp::Object>(new lisp::I32(result));
+    auto result = roundf(F32::value(args->car()));
+    return shared_ptr<Object>(new I32(result));
 }
 
-std::shared_ptr<lisp::Object> not_(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> not_(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() != 1)
     {
-        throw lisp::Error::with_object("not: needs 1 arg: ", *args->car());
+        throw Error::with_object("not: needs 1 arg: ", *args->car());
     }
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(!Boolean::value(args->car())));
+    return shared_ptr<Object>(new Boolean(!Boolean::value(args->car())));
 }
 
-std::shared_ptr<lisp::Object> and_(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> and_(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() < 1)
     {
-        throw lisp::Error::with_object("and: needs 2 or more args: ", *obj);
+        throw Error::with_object("and: needs 2 or more args: ", *obj);
     }
     auto it = args->iterator();
     for (; !it->is_done(); it->next())
     {
-        if (!lisp::Boolean::value(it->get()))
+        if (!Boolean::value(it->get()))
         {
-            return std::shared_ptr<lisp::Object>(new lisp::Boolean(false));
+            return shared_ptr<Object>(new Boolean(false));
         }
     }
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(true));
+    return shared_ptr<Object>(new Boolean(true));
 }
 
-std::shared_ptr<lisp::Object> or_(std::shared_ptr<lisp::Object> obj)
+shared_ptr<Object> or_(shared_ptr<Object> obj)
 {
-    auto args = lisp::List::to(obj);
+    auto args = List::to(obj);
     if (args->size() < 1)
     {
-        throw lisp::Error::with_object("or: needs 2 or more args: ", *obj);
+        throw Error::with_object("or: needs 2 or more args: ", *obj);
     }
     auto it = args->iterator();
     for (; !it->is_done(); it->next())
     {
-        if (lisp::Boolean::value(it->get()))
+        if (Boolean::value(it->get()))
         {
-            return std::shared_ptr<lisp::Object>(new lisp::Boolean(true));
+            return shared_ptr<Object>(new Boolean(true));
         }
     }
-    return std::shared_ptr<lisp::Object>(new lisp::Boolean(false));
+    return shared_ptr<Object>(new Boolean(false));
 }
 
 void def_cpp_fn(
-    std::shared_ptr<lisp::Environment> env,
-    const std::string &name, std::shared_ptr<lisp::Object> (*fn)(std::shared_ptr<lisp::Object> obj)
+    shared_ptr<Environment> env,
+    const std::string &name, shared_ptr<Object> (*fn)(shared_ptr<Object> obj)
 ){
-    env->define(name, std::shared_ptr<lisp::Object>(new lisp::CppFunction(fn, name)));
+    env->define(name, shared_ptr<Object>(new CppFunction(fn, name)));
 }
 
-std::shared_ptr<lisp::Environment> prelude()
+shared_ptr<Environment> prelude()
 {
-    auto env = std::shared_ptr<lisp::Environment>(new lisp::Environment);
+    auto env = shared_ptr<Environment>(new Environment);
+    env->define("else", shared_ptr<Object>(new Boolean(true)));
     def_cpp_fn(env, "null?", is_null);
     def_cpp_fn(env, "pair?", is_pair);
     def_cpp_fn(env, "print", print);
@@ -293,7 +296,7 @@ std::shared_ptr<lisp::Environment> prelude()
     return env;
 }
 
-std::shared_ptr<lisp::Environment> static_prelude()
+shared_ptr<Environment> static_prelude()
 {
     static auto env = prelude();
     return env;

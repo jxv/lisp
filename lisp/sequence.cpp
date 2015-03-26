@@ -12,11 +12,14 @@ Sequence::Sequence(std::vector<std::shared_ptr<Object> > &statements)
 
 void Sequence::write(std::ostream &os) const
 {
-    os << "( begin ";
+    os << "(do ";
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
         os << *it;
-        os << " ";
+        if (*it != m_statements.back())
+        {
+            os << " ";
+        }
     }
     os << ")";
 }

@@ -18,6 +18,7 @@
 #include "lisp/sequence.h"
 #include "lisp/string.h"
 #include "lisp/symbol.h"
+#include "lisp/vectorlist.h"
 #include "lisp/void.h"
 
 #endif // LISP_H
