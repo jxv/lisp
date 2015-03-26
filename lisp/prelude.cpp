@@ -1,4 +1,5 @@
 #include "boolean.h"
+#include "empty.h"
 #include "environment.h"
 #include "error.h"
 #include "number.h"
@@ -12,6 +13,18 @@
 
 namespace lisp
 {
+
+std::shared_ptr<lisp::Object> is_null(std::shared_ptr<lisp::Object> obj)
+{
+    auto arg = lisp::List::to(obj)->car();
+    return std::shared_ptr<lisp::Object>(new lisp::Boolean(arg == lisp::Empty::get()));
+}
+
+std::shared_ptr<lisp::Object> is_pair(std::shared_ptr<lisp::Object> obj)
+{
+    auto arg = lisp::List::to(obj)->car();
+    return std::shared_ptr<lisp::Object>(new lisp::Boolean(arg->type() == Type::List));
+}
 
 std::shared_ptr<lisp::Object> print(std::shared_ptr<lisp::Object> obj)
 {
@@ -260,6 +273,8 @@ void def_cpp_fn(
 std::shared_ptr<lisp::Environment> prelude()
 {
     auto env = std::shared_ptr<lisp::Environment>(new lisp::Environment);
+    def_cpp_fn(env, "null?", is_null);
+    def_cpp_fn(env, "pair?", is_pair);
     def_cpp_fn(env, "print", print);
     def_cpp_fn(env, "get-line", get_line);
     def_cpp_fn(env, "+", add);
