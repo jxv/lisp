@@ -7,7 +7,9 @@
 #include "parser.h"
 
 #include "error.h"
-#include "list.h"
+#include "empty.h"
+#include "linkedlist.h"
+#include "pair.h"
 #include "string.h"
 #include "symbol.h"
 #include "boolean.h"
