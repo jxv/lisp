@@ -1,5 +1,6 @@
 #include "sequence.h"
 #include "error.h"
+#include "void.h"
 
 namespace lisp
 {
@@ -32,7 +33,7 @@ Type Sequence::type() const
 
 std::shared_ptr<Object> Sequence::eval(std::shared_ptr<Environment> env)
 {
-    std::shared_ptr<Object> last = nullptr;
+    std::shared_ptr<Object> last = Void::get();
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
         last = lisp::eval(env, *it);

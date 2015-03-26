@@ -1,5 +1,6 @@
 #include "environment.h"
 #include "error.h"
+#include "nil.h"
 
 namespace lisp
 {
@@ -28,7 +29,7 @@ std::shared_ptr<Object> Environment::get(const std::string &key) const
     catch (const std::out_of_range&)
     {
     }
-    std::shared_ptr<Object> obj = nullptr;
+    std::shared_ptr<Object> obj = Nil::get();
     for (auto env = m_parent; env != nullptr; env = env->m_parent)
     {
         try

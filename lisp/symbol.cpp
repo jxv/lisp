@@ -1,6 +1,7 @@
 #include "symbol.h"
 #include "error.h"
 #include "environment.h"
+#include "nil.h"
 
 namespace lisp
 {
@@ -40,7 +41,7 @@ const std::string& Symbol::name() const
 std::shared_ptr<Object> Symbol::eval(std::shared_ptr<Environment> env)
 {
     auto obj = env->get(m_name);
-    if (obj == nullptr)
+    if (obj == Nil::get())
     {
         throw Error::with_object("can't find symbol", *this);
     }
