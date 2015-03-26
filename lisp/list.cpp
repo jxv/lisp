@@ -4,6 +4,7 @@
 #include "environment.h"
 #include "boolean.h"
 #include "function.h"
+#include "nil.h"
 
 namespace lisp
 {
@@ -36,6 +37,22 @@ Type List::type() const
     return Type::List;
 }
 
+bool List::eq(std::shared_ptr<Object> obj) const
+{
+    try
+    {
+        auto list = List::to(obj);
+        if (size() == 0 && list->size() == 0)
+        {
+            return true;
+        }
+    }
+    catch(lisp::Error)
+    {
+    }
+    return false;
+}
+
 std::shared_ptr<List> List::to(std::shared_ptr<Object> obj)
 {
     if (obj->type() != Type::List)
@@ -43,6 +60,133 @@ std::shared_ptr<List> List::to(std::shared_ptr<Object> obj)
         throw Error::with_object("not list", *obj);
     }
     return std::dynamic_pointer_cast<List>(obj);
+}
+
+Pair::Pair(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr)
+    : m_car(car)
+    , m_cdr(cdr)
+{
+}
+
+std::shared_ptr<Object> Pair::car() const
+{
+    return m_car;
+}
+
+std::shared_ptr<Object> Pair::cdr() const
+{
+    return m_cdr;
+}
+
+std::shared_ptr<Object> Pair::eval(std::shared_ptr<Environment> env)
+{
+    try
+    {
+        auto fn = lisp::eval(env, Symbol::to(m_car));
+        return fn->apply(m_cdr);
+    }
+    catch(lisp::Error)
+    {
+        throw Error("can't eval list");
+    }
+}
+
+unsigned int Pair::size() const
+{
+    try
+    {
+       return List::to(m_cdr)->size() + 1;
+    }
+    catch(lisp::Error)
+    {
+    }
+    return 0; 
+}
+
+std::unique_ptr<lisp::Iterator> Pair::iterator() const
+{
+    new std::shared_ptr<lisp::Iterator>(new PairIterator(m_car, m_cdr));
+}
+
+bool Pair::is_last_empty() const
+{
+    if (m_cdr == Empty::get())
+    {
+        return true;
+    }
+    try
+    {
+        return List::to(m_cdr)->is_last_empty();
+    }
+    catch(lisp::Error)
+    {
+    }
+    return false;
+}
+
+void Pair::set_last_empty()
+{
+    if (m_cdr == Empty::get())
+    {
+        return;
+    }
+    try
+    {
+        return List::to(m_cdr)->set_last_empty();
+    }
+    catch(lisp::Error)
+    {
+        auto cdr = m_cdr;
+        m_cdr = std::shared_ptr<Object>(new Pair(cdr, Empty::get()));
+    }
+}
+
+PairIterator::PairIterator(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr)
+    : m_car(car)
+    , m_cdr(cdr)
+{
+}
+
+void PairIterator::next()
+{
+
+    if (is_done())
+    {
+        throw Error("can't next, pair iterator is done");
+    }
+    else if (is_last())
+    {
+        m_car = m_cdr;
+        m_cdr = Empty::get();
+    }
+    else
+    {
+        try
+        {
+            auto cdr = List::to(m_cdr)->cdr();
+            m_car = m_cdr;
+            m_cdr = cdr;
+        }
+        catch(lisp::Error)
+        {
+            throw Error("can't next, cdr is not a list");
+        }
+    }
+}
+
+bool PairIterator::is_done() const
+{
+    return m_car == Empty::get() && m_cdr == Empty::get();
+}
+
+bool PairIterator::is_last() const
+{
+    return m_car != Empty::get() && m_cdr == Empty::get();
+}
+
+std::shared_ptr<Object> PairIterator::get() const
+{
+    return m_car;
 }
 
 LinkedList::LinkedList(std::list<std::shared_ptr<Object>> &items, bool is_last_empty)
@@ -86,6 +230,7 @@ std::shared_ptr<Object> LinkedList::eval(std::shared_ptr<Environment> env)
     if ((obj = eval_cons(env)) != nullptr) return obj;
     if ((obj = eval_car(env)) != nullptr) return obj;
     if ((obj = eval_cdr(env)) != nullptr) return obj;
+    if ((obj = eval_eq(env)) != nullptr) return obj;
     if ((obj = eval_function(env)) != nullptr) return obj;
     throw Error("can't eval list");
 }
@@ -152,11 +297,11 @@ std::shared_ptr<Object> LinkedList::eval_if(std::shared_ptr<Environment> env) co
     if (!(Symbol::name(op) == "if")) return nullptr;
     if (Boolean::value(lisp::eval(env, pred)))
     {
-        return lisp::eval(env, lisp::eval(env, on_true));
+        return lisp::eval(env, on_true);
     }
     else
     {
-        return lisp::eval(env, lisp::eval(env, on_false));
+        return lisp::eval(env, on_false);
     }
 }
 
@@ -290,6 +435,20 @@ std::shared_ptr<Object> LinkedList::eval_cdr(std::shared_ptr<Environment> env) c
     return List::to(lisp::eval(env, list))->cdr();
 }
 
+std::shared_ptr<Object> LinkedList::eval_eq(std::shared_ptr<Environment> env) const
+{
+    if (!(m_items.size() == 3)) return nullptr;
+    auto it = m_items.begin();
+    auto op = *it;
+    it++;
+    auto fst = *it;
+    it++;
+    auto snd = *it;
+    if (!(op->type() == Type::Symbol)) return nullptr;
+    if (!(Symbol::name(op) == "eq?")) return nullptr;
+    return std::shared_ptr<Boolean>(new Boolean(lisp::eval(env, fst)->eq(lisp::eval(env, snd))));
+}
+
 Empty::Empty()
 {
 }
@@ -378,11 +537,11 @@ std::shared_ptr<Object> cons(std::shared_ptr<Object> car, std::shared_ptr<Object
     {
         std::list<std::shared_ptr<Object>> items;
         auto list = std::dynamic_pointer_cast<lisp::List>(cdr);
+        items.push_front(car);
         for (auto it = list->iterator(); !it->is_done(); it->next())
         {
             items.push_back(it->get());
         }
-        items.push_front(car);
         return std::shared_ptr<LinkedList>(new LinkedList(items, list->is_last_empty()));
     }
     std::list<std::shared_ptr<Object>> items = { car, cdr };

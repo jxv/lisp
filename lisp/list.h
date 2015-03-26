@@ -13,6 +13,7 @@ class List : public Object
 public:
     virtual void write(std::ostream &os) const;
     Type type() const;
+    bool eq(std::shared_ptr<Object>) const;
     virtual std::shared_ptr<Object> car() const = 0;
     virtual std::shared_ptr<Object> cdr() const = 0;
     virtual std::shared_ptr<Object> eval(std::shared_ptr<Environment> env) = 0;
@@ -48,6 +49,34 @@ private:
     Empty();
 };
 
+class Pair : public List
+{
+public:
+    Pair(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr);
+    std::shared_ptr<Object> car() const;
+    std::shared_ptr<Object> cdr() const;
+    std::shared_ptr<Object> eval(std::shared_ptr<Environment> env);
+    unsigned int size() const;
+    std::unique_ptr<lisp::Iterator> iterator() const;
+    bool is_last_empty() const;
+    void set_last_empty();
+private:
+    std::shared_ptr<Object> m_car;
+    std::shared_ptr<Object> m_cdr; 
+};
+
+class PairIterator : public Iterator
+{
+public:
+    PairIterator(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr);
+    void next();
+    bool is_done() const;
+    bool is_last() const;
+    std::shared_ptr<lisp::Object> get() const;
+private:
+    std::shared_ptr<Object> m_car;
+    std::shared_ptr<Object> m_cdr; 
+};
 
 class LinkedList : public List
 {
@@ -70,6 +99,7 @@ private:
     std::shared_ptr<Object> eval_cons(std::shared_ptr<Environment> env) const;
     std::shared_ptr<Object> eval_car(std::shared_ptr<Environment> env) const;
     std::shared_ptr<Object> eval_cdr(std::shared_ptr<Environment> env) const;
+    std::shared_ptr<Object> eval_eq(std::shared_ptr<Environment> env) const;
     std::shared_ptr<Object> eval_function(std::shared_ptr<Environment> env) const;
 private:
     bool m_is_last_empty;

@@ -9,6 +9,18 @@ I32::I32(int v)
 {
 }
 
+bool I32::eq(std::shared_ptr<Object> obj) const
+{
+    try
+    {
+        return Number::value() == I32::value(obj);
+    }
+    catch(lisp::Error)
+    {
+    }
+    return false;
+}
+
 std::shared_ptr<I32> I32::to(std::shared_ptr<Object> obj)
 {
     if (obj->type() != Type::I32)
@@ -26,6 +38,18 @@ int I32::value(std::shared_ptr<Object> obj)
 F32::F32(float v)
     : Number(v)
 {
+}
+
+bool F32::eq(std::shared_ptr<Object> obj) const
+{
+    try
+    {
+        return Number::value() == F32::value(obj);
+    }
+    catch(lisp::Error)
+    {
+    }
+    return false;
 }
 
 std::shared_ptr<F32> F32::to(std::shared_ptr<Object> obj)

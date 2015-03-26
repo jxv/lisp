@@ -20,6 +20,18 @@ Type Symbol::type() const
     return Type::Symbol;
 }
 
+bool Symbol::eq(std::shared_ptr<Object> obj) const
+{
+    try
+    {
+        return m_name == Symbol::name(obj);
+    }
+    catch(lisp::Error)
+    {
+    }
+    return false;
+}
+
 const std::string& Symbol::name() const
 {
     return m_name;

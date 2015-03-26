@@ -17,10 +17,4 @@
 #include "lisp/symbol.h"
 #include "lisp/void.h"
 
-/*
- * atom
- * eq
- * label
-*/
-
 #endif // LISP_H

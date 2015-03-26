@@ -12,6 +12,7 @@ class Number : public Object
 public:
     Number(A value);
     void write(std::ostream &os) const;
+    virtual bool eq(std::shared_ptr<Object>) const = 0;
     Type type() const;
     A value() const;
 private:
@@ -36,6 +37,7 @@ Type Number<A,B>::type() const
     return B;
 }
 
+
 template <typename A, Type B>
 A Number<A,B>::value() const
 {
@@ -46,6 +48,7 @@ class I32 : public Number<int, Type::I32>
 {
 public:
     I32(int v);
+    bool eq(std::shared_ptr<Object>) const;
     static std::shared_ptr<I32> to(std::shared_ptr<Object>);
     static int value(std::shared_ptr<Object>);
 };
@@ -54,6 +57,7 @@ class F32 : public Number<float, Type::F32>
 {
 public:
     F32(float v);
+    bool eq(std::shared_ptr<Object>) const;
     static std::shared_ptr<F32> to(std::shared_ptr<Object>);
     static float value(std::shared_ptr<Object>);
 };

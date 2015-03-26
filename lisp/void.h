@@ -11,6 +11,7 @@ class Void : public Object
 public:
     void write(std::ostream &) const;
     Type type() const;
+    bool eq(std::shared_ptr<Object> obj) const;
     static std::shared_ptr<Void> get();
 };
 

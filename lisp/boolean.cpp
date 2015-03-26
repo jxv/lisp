@@ -24,6 +24,18 @@ Type Boolean::type() const
     return Type::Boolean;
 }
 
+bool Boolean::eq(std::shared_ptr<Object> obj) const
+{
+    try
+    {
+        return m_value == Boolean::value(obj);
+    }
+    catch(lisp::Error)
+    {
+    }
+    return false;
+}
+
 bool Boolean::value() const
 {
     return m_value;

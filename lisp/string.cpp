@@ -180,6 +180,19 @@ void String::write(std::ostream &os) const
     }
     os << '"';
 }
+    
+bool String::eq(std::shared_ptr<Object> obj) const
+{
+    try
+    {
+        auto str = String::to(obj);
+        return m_value == str->value();
+    }
+    catch(lisp::Error)
+    {
+    }
+    return false;
+}
 
 void String::show(std::ostream &os) const
 {

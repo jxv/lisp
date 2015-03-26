@@ -11,6 +11,7 @@ class Symbol : public Object
 public:
     Symbol(const std::string &name);
     void write(std::ostream &) const;
+    bool eq(std::shared_ptr<Object> obj) const;
     Type type() const;
     const std::string &name() const;
     std::shared_ptr<Object> eval(std::shared_ptr<Environment>);

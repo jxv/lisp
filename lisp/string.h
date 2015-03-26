@@ -12,6 +12,7 @@ public:
     String(const std::string &);
     static std::shared_ptr<String> from_escape_chars(const std::string &);
     void write(std::ostream &) const;
+    bool eq(std::shared_ptr<Object>) const;
     void show(std::ostream &) const;
     Type type() const;
     const std::string &value() const;

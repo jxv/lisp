@@ -1,4 +1,5 @@
 #include "sequence.h"
+#include "error.h"
 
 namespace lisp
 {
@@ -19,6 +20,11 @@ void Sequence::write(std::ostream &os) const
     os << ")";
 }
 
+bool Sequence::eq(std::shared_ptr<Object> obj) const
+{
+    return false;
+}
+
 Type Sequence::type() const
 {
     return Type::Sequence;
@@ -32,6 +38,15 @@ std::shared_ptr<Object> Sequence::eval(std::shared_ptr<Environment> env)
         last = lisp::eval(env, *it);
     }
     return last;
+}
+    
+std::shared_ptr<Sequence> Sequence::to(std::shared_ptr<Object> obj)
+{
+    if (obj->type() != Type::Sequence)
+    {
+        throw Error::with_object("not sequence", *obj);
+    }
+    return std::dynamic_pointer_cast<Sequence>(obj);
 }
 
 }

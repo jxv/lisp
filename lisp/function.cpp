@@ -37,6 +37,11 @@ void CppFunction::write(std::ostream &os) const
         os << ">";
     }
 }
+    
+bool CppFunction::eq(std::shared_ptr<Object> obj) const
+{
+    return false;
+}
 
 std::shared_ptr<Object> CppFunction::apply(std::shared_ptr<Object> obj)
 {
@@ -80,6 +85,11 @@ void Lambda::write(std::ostream &os) const
     os << ") ";
     os << m_body;
     os << ")";
+}
+    
+bool Lambda::eq(std::shared_ptr<Object> obj) const
+{
+    return false;
 }
 
 std::shared_ptr<Object> Lambda::apply(std::shared_ptr<Object> obj)

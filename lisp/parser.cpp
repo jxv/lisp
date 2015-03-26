@@ -234,7 +234,18 @@ std::shared_ptr<Object> Parser::parse_tokens()
         }
         else
         {
-            return std::shared_ptr<Object>(new lisp::LinkedList(list));
+            return std::shared_ptr<Object>(new lisp::LinkedList(list, true));
+/*
+            auto it = list.rbegin();
+            auto pair = std::shared_ptr<Object>(new lisp::Pair(*it, Empty::get()));
+            it++;
+            for (; it != list.rend(); ++it)
+            {
+                auto next = std::shared_ptr<Object>(new lisp::Pair(*it, pair));
+                pair = next;
+            }
+            return pair;
+*/
         }
     }
     else if (token == ")")
