@@ -14,17 +14,9 @@ void List::write(std::ostream &os) const
     os << "(";
     for (auto it = iterator(); !it->is_done(); it->next())
     {
-        if (it->is_last())
+        os << it->get();
+        if (!it->is_last())
         {
-            if (!is_last_empty())
-            {
-                os << ". ";
-            }
-            os << it->get();
-        }
-        else
-        {
-            os << it->get();
             os << " ";
         }
     }
@@ -108,39 +100,6 @@ std::unique_ptr<lisp::Iterator> Pair::iterator() const
     new std::shared_ptr<lisp::Iterator>(new PairIterator(m_car, m_cdr));
 }
 
-bool Pair::is_last_empty() const
-{
-    if (m_cdr == Empty::get())
-    {
-        return true;
-    }
-    try
-    {
-        return List::to(m_cdr)->is_last_empty();
-    }
-    catch(lisp::Error)
-    {
-    }
-    return false;
-}
-
-void Pair::set_last_empty()
-{
-    if (m_cdr == Empty::get())
-    {
-        return;
-    }
-    try
-    {
-        return List::to(m_cdr)->set_last_empty();
-    }
-    catch(lisp::Error)
-    {
-        auto cdr = m_cdr;
-        m_cdr = std::shared_ptr<Object>(new Pair(cdr, Empty::get()));
-    }
-}
-
 PairIterator::PairIterator(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr)
     : m_car(car)
     , m_cdr(cdr)
@@ -189,10 +148,13 @@ std::shared_ptr<Object> PairIterator::get() const
     return m_car;
 }
 
-LinkedList::LinkedList(std::list<std::shared_ptr<Object>> &items, bool is_last_empty)
-    : m_is_last_empty(is_last_empty)
-    , m_items(items)
+LinkedList::LinkedList(std::list<std::shared_ptr<Object>> &items)
+    : m_items(items)
 {
+    if (items.size() < 1)
+    {
+        throw Error("linked list must contain items");
+    }
 }
 
 std::shared_ptr<Object> LinkedList::car() const
@@ -202,20 +164,13 @@ std::shared_ptr<Object> LinkedList::car() const
 
 std::shared_ptr<Object> LinkedList::cdr() const
 {
-    if (m_items.size() == 0)
+    if (m_items.size() == 1)
     {
-        if (m_is_last_empty)
-        {
-            return Empty::get();
-        }
-        else
-        {
-            throw Error("pair expected");
-        }
+        return Empty::get();
     }
     auto items = m_items;
     items.pop_front();
-    return std::shared_ptr<LinkedList>(new LinkedList(items, m_is_last_empty));
+    return std::shared_ptr<LinkedList>(new LinkedList(items));
 }
 
 std::shared_ptr<Object> LinkedList::eval(std::shared_ptr<Environment> env)
@@ -244,16 +199,6 @@ std::unique_ptr<lisp::Iterator> LinkedList::iterator() const
 {
     auto it = new LinkedList_Iterator(m_items.begin(), m_items.end());
     return std::unique_ptr<lisp::Iterator>(it);
-}
-
-bool LinkedList::is_last_empty() const
-{
-    return m_is_last_empty;
-}
-
-void LinkedList::set_last_empty()
-{
-    m_is_last_empty = true;
 }
 
 std::shared_ptr<Object> LinkedList::eval_quote() const
@@ -408,7 +353,9 @@ std::shared_ptr<Object> LinkedList::eval_cons(std::shared_ptr<Environment> env) 
     auto snd = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
     if (!(Symbol::name(op) == "cons")) return nullptr;
-    return lisp::cons(lisp::eval(env, fst), lisp::eval(env, snd));
+    auto car = lisp::eval(env, fst);
+    auto cdr = lisp::eval(env, snd);
+    return lisp::cons(car, cdr);
 }
 
 std::shared_ptr<Object> LinkedList::eval_car(std::shared_ptr<Environment> env) const
@@ -446,7 +393,9 @@ std::shared_ptr<Object> LinkedList::eval_eq(std::shared_ptr<Environment> env) co
     auto snd = *it;
     if (!(op->type() == Type::Symbol)) return nullptr;
     if (!(Symbol::name(op) == "eq?")) return nullptr;
-    return std::shared_ptr<Boolean>(new Boolean(lisp::eval(env, fst)->eq(lisp::eval(env, snd))));
+    auto left = lisp::eval(env, fst);
+    auto right = lisp::eval(env, snd);
+    return std::shared_ptr<Boolean>(new Boolean(left->eq(right)));
 }
 
 Empty::Empty()
@@ -489,15 +438,6 @@ std::unique_ptr<Iterator> Empty::iterator() const
     return nullptr;
 }
 
-bool Empty::is_last_empty() const
-{
-    return false;
-}
-
-void Empty::set_last_empty()
-{
-}
-
 LinkedList_Iterator::LinkedList_Iterator(std::list<std::shared_ptr<Object>>::const_iterator start, std::list<std::shared_ptr<Object>>::const_iterator last)
     : m_current(start)
     , m_last(last)
@@ -528,24 +468,23 @@ std::shared_ptr<Object> LinkedList_Iterator::get() const
 
 std::shared_ptr<Object> cons(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr)
 {
+    if (cdr->type() != Type::List)
+    {
+        throw Error("cons's cdr must be a of type list");
+    }
     if (cdr == Empty::get())
     {
         std::list<std::shared_ptr<Object>> items = { car };
-        return std::shared_ptr<LinkedList>(new LinkedList(items, true));
+        return std::shared_ptr<LinkedList>(new LinkedList(items));
     }
-    if (cdr->type() == Type::List)
+    std::list<std::shared_ptr<Object>> items;
+    auto list = std::dynamic_pointer_cast<lisp::List>(cdr);
+    items.push_front(car);
+    for (auto it = list->iterator(); !it->is_done(); it->next())
     {
-        std::list<std::shared_ptr<Object>> items;
-        auto list = std::dynamic_pointer_cast<lisp::List>(cdr);
-        items.push_front(car);
-        for (auto it = list->iterator(); !it->is_done(); it->next())
-        {
-            items.push_back(it->get());
-        }
-        return std::shared_ptr<LinkedList>(new LinkedList(items, list->is_last_empty()));
+        items.push_back(it->get());
     }
-    std::list<std::shared_ptr<Object>> items = { car, cdr };
-    return std::shared_ptr<LinkedList>(new LinkedList(items, false));
+    return std::shared_ptr<LinkedList>(new LinkedList(items));
 }
 
 }

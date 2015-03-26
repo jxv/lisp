@@ -234,7 +234,7 @@ std::shared_ptr<Object> Parser::parse_tokens()
         }
         else
         {
-            return std::shared_ptr<Object>(new lisp::LinkedList(list, true));
+            return std::shared_ptr<Object>(new lisp::LinkedList(list));
 /*
             auto it = list.rbegin();
             auto pair = std::shared_ptr<Object>(new lisp::Pair(*it, Empty::get()));

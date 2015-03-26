@@ -19,8 +19,6 @@ public:
     virtual std::shared_ptr<Object> eval(std::shared_ptr<Environment> env) = 0;
     virtual unsigned int size() const = 0;
     virtual std::unique_ptr<lisp::Iterator> iterator() const = 0;
-    virtual bool is_last_empty() const = 0;
-    virtual void set_last_empty() = 0;
     static std::shared_ptr<List> to(std::shared_ptr<Object>);
 };
 
@@ -42,8 +40,6 @@ public:
     std::shared_ptr<Object> eval(std::shared_ptr<Environment> env);
     unsigned int size() const;
     std::unique_ptr<lisp::Iterator> iterator() const;
-    bool is_last_empty() const;
-    void set_last_empty();
     static std::shared_ptr<Object> get();
 private:
     Empty();
@@ -58,8 +54,6 @@ public:
     std::shared_ptr<Object> eval(std::shared_ptr<Environment> env);
     unsigned int size() const;
     std::unique_ptr<lisp::Iterator> iterator() const;
-    bool is_last_empty() const;
-    void set_last_empty();
 private:
     std::shared_ptr<Object> m_car;
     std::shared_ptr<Object> m_cdr; 
@@ -81,14 +75,12 @@ private:
 class LinkedList : public List
 {
 public:
-    LinkedList(std::list<std::shared_ptr<Object>> &items, bool is_last_empty = false);
+    LinkedList(std::list<std::shared_ptr<Object>> &items);
     std::shared_ptr<Object> car() const;
     std::shared_ptr<Object> cdr() const;
     std::shared_ptr<Object> eval(std::shared_ptr<Environment> env);
     unsigned int size() const;
     std::unique_ptr<lisp::Iterator> iterator() const;
-    bool is_last_empty() const;
-    void set_last_empty();
 private:
     std::shared_ptr<Object> eval_quote() const;
     std::shared_ptr<Object> eval_set(std::shared_ptr<Environment> env) const;
@@ -102,7 +94,6 @@ private:
     std::shared_ptr<Object> eval_eq(std::shared_ptr<Environment> env) const;
     std::shared_ptr<Object> eval_function(std::shared_ptr<Environment> env) const;
 private:
-    bool m_is_last_empty;
     std::list<std::shared_ptr<Object>> m_items;
 };
 

@@ -9,13 +9,6 @@ namespace lisp
 Quote::Quote(std::shared_ptr<Object> obj)
     : m_object(obj)
 {
-    try
-    {
-        List::to(m_object)->set_last_empty();
-    }
-    catch(lisp::Error)
-    {
-    }
 }
 
 void Quote::write(std::ostream &os) const
