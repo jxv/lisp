@@ -2,6 +2,8 @@
 #include "error.h"
 #include <cstring>
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
@@ -10,7 +12,7 @@ String::String(const std::string &v)
 {
 }
 
-std::shared_ptr<String> String::from_escape_chars(const std::string &v)
+shared_ptr<String> String::from_escape_chars(const std::string &v)
 {
     std::string str;
     // Absolute minimum required size. Will likely still grow.
@@ -100,7 +102,7 @@ std::shared_ptr<String> String::from_escape_chars(const std::string &v)
     {
         throw Error("expected escape char");
     }
-    return std::shared_ptr<String>(new String(str));
+    return shared_ptr<String>(new String(str));
 }
 
 void String::write(std::ostream &os) const
@@ -181,7 +183,7 @@ void String::write(std::ostream &os) const
     os << '"';
 }
     
-bool String::eq(std::shared_ptr<Object> obj) const
+bool String::eq(shared_ptr<Object> obj) const
 {
     try
     {
@@ -210,7 +212,7 @@ const std::string &String::value() const
     return m_value;
 }
 
-std::shared_ptr<String> String::to(std::shared_ptr<Object> obj)
+shared_ptr<String> String::to(shared_ptr<Object> obj)
 {
     if (obj->type() != Type::String)
     {
@@ -219,7 +221,7 @@ std::shared_ptr<String> String::to(std::shared_ptr<Object> obj)
     return std::dynamic_pointer_cast<String>(obj);
 }
 
-const std::string &String::value(std::shared_ptr<Object> obj)
+const std::string &String::value(shared_ptr<Object> obj)
 {
     return String::to(obj)->value();
 }

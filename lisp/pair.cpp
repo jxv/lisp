@@ -7,26 +7,28 @@
 #include "function.h"
 #include "nil.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
-Pair::Pair(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr)
+Pair::Pair(shared_ptr<Object> car, shared_ptr<Object> cdr)
     : m_car(car)
     , m_cdr(cdr)
 {
 }
 
-std::shared_ptr<Object> Pair::car() const
+shared_ptr<Object> Pair::car() const
 {
     return m_car;
 }
 
-std::shared_ptr<Object> Pair::cdr() const
+shared_ptr<Object> Pair::cdr() const
 {
     return m_cdr;
 }
 
-std::shared_ptr<Object> Pair::eval(std::shared_ptr<Environment> env)
+shared_ptr<Object> Pair::eval(shared_ptr<Environment> env)
 {
     try
     {
@@ -53,10 +55,10 @@ unsigned int Pair::size() const
 
 std::unique_ptr<lisp::Iterator> Pair::iterator() const
 {
-    new std::shared_ptr<lisp::Iterator>(new PairIterator(m_car, m_cdr));
+    new shared_ptr<lisp::Iterator>(new PairIterator(m_car, m_cdr));
 }
 
-PairIterator::PairIterator(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr)
+PairIterator::PairIterator(shared_ptr<Object> car, shared_ptr<Object> cdr)
     : m_car(car)
     , m_cdr(cdr)
 {
@@ -99,7 +101,7 @@ bool PairIterator::is_last() const
     return m_car != Empty::get() && m_cdr == Empty::get();
 }
 
-std::shared_ptr<Object> PairIterator::get() const
+shared_ptr<Object> PairIterator::get() const
 {
     return m_car;
 }

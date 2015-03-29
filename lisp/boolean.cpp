@@ -1,6 +1,8 @@
 #include "boolean.h"
 #include "error.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
@@ -24,7 +26,7 @@ Type Boolean::type() const
     return Type::Boolean;
 }
 
-bool Boolean::eq(std::shared_ptr<Object> obj) const
+bool Boolean::eq(shared_ptr<Object> obj) const
 {
     try
     {
@@ -41,12 +43,12 @@ bool Boolean::value() const
     return m_value;
 }
 
-bool Boolean::value(std::shared_ptr<Object> obj)
+bool Boolean::value(shared_ptr<Object> obj)
 {
     return Boolean::to(obj)->value();
 }
 
-std::shared_ptr<Boolean> Boolean::to(std::shared_ptr<Object> obj)
+shared_ptr<Boolean> Boolean::to(shared_ptr<Object> obj)
 {
     if (obj->type() != Type::Boolean)
     {

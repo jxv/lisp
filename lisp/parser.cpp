@@ -17,6 +17,8 @@
 #include "quote.h"
 #include "sequence.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
@@ -154,12 +156,12 @@ void Parser::step_escape_char(std::string::const_iterator it)
     m_mode = Mode::String;
 }
 
-std::shared_ptr<Object> Parser::parse_atom(std::string const &token) const
+shared_ptr<Object> Parser::parse_atom(std::string const &token) const
 {
     // string token
     if (token.length() >= 2 && token.front() == '"' && token.back() == '"')
     {
-        return std::shared_ptr<Object>(new lisp::String(token.substr(1, token.length() - 2)));
+        return shared_ptr<Object>(new lisp::String(token.substr(1, token.length() - 2)));
     }
 
     // boolean token
@@ -169,11 +171,11 @@ std::shared_ptr<Object> Parser::parse_atom(std::string const &token) const
         {
         case 't':
         {
-            return std::shared_ptr<Object>(new lisp::Boolean(true));
+            return shared_ptr<Object>(new lisp::Boolean(true));
         }
         case 'f':
         {
-            return std::shared_ptr<Object>(new lisp::Boolean(false));
+            return shared_ptr<Object>(new lisp::Boolean(false));
         }
         default:
         {
@@ -192,7 +194,7 @@ std::shared_ptr<Object> Parser::parse_atom(std::string const &token) const
         try
         {
             float f = std::stof(token);
-            return std::shared_ptr<Object>(new lisp::F32(f));
+            return shared_ptr<Object>(new lisp::F32(f));
         }
         catch (std::exception)
         {
@@ -203,17 +205,17 @@ std::shared_ptr<Object> Parser::parse_atom(std::string const &token) const
     try
     {
         int i = std::stoi(token);
-        return std::shared_ptr<Object>(new lisp::I32(i));
+        return shared_ptr<Object>(new lisp::I32(i));
     }
     catch (std::exception)
     {
     }
 
     // fallback on symbol
-    return std::shared_ptr<Object>(new lisp::Symbol(token));
+    return shared_ptr<Object>(new lisp::Symbol(token));
 }
 
-std::shared_ptr<Object> Parser::parse_tokens()
+shared_ptr<Object> Parser::parse_tokens()
 {
     if (m_tokens.empty())
     {
@@ -223,27 +225,27 @@ std::shared_ptr<Object> Parser::parse_tokens()
     m_tokens.pop_front();
     if (token == "(")
     {
-        std::list<std::shared_ptr<Object>> list;
+        std::list<shared_ptr<Object>> list;
         while (m_tokens.front() != ")")
         {
-            std::shared_ptr<Object> obj = parse_tokens();
+            shared_ptr<Object> obj = parse_tokens();
             list.push_back(obj);
         }
         m_tokens.pop_front();
         if (list.size() == 0)
         {
-            return std::shared_ptr<Object>(lisp::Empty::get());
+            return shared_ptr<Object>(lisp::Empty::get());
         }
         else
         {
-            return std::shared_ptr<Object>(new lisp::LinkedList(list));
+            return shared_ptr<Object>(new lisp::LinkedList(list));
 /*
             auto it = list.rbegin();
-            auto pair = std::shared_ptr<Object>(new lisp::Pair(*it, Empty::get()));
+            auto pair = shared_ptr<Object>(new lisp::Pair(*it, Empty::get()));
             it++;
             for (; it != list.rend(); ++it)
             {
-                auto next = std::shared_ptr<Object>(new lisp::Pair(*it, pair));
+                auto next = shared_ptr<Object>(new lisp::Pair(*it, pair));
                 pair = next;
             }
             return pair;
@@ -257,14 +259,14 @@ std::shared_ptr<Object> Parser::parse_tokens()
     else if (token == "'")
     {
         auto obj = parse_tokens();
-        return std::shared_ptr<Object>(new lisp::Quote(obj));
+        return shared_ptr<Object>(new lisp::Quote(obj));
     }
     else {
         return parse_atom(token);
     }
 }
 
-std::shared_ptr<Object> Parser::parse()
+shared_ptr<Object> Parser::parse()
 {
     // add space to parens for easier parsing
     {
@@ -308,12 +310,12 @@ std::shared_ptr<Object> Parser::parse()
         }
     }
 
-    std::vector<std::shared_ptr<Object>> seq;
+    std::vector<shared_ptr<Object>> seq;
     while (!m_tokens.empty())
     {
         seq.push_back(parse_tokens());
     }
-    return std::shared_ptr<Object>(new Sequence(seq));
+    return shared_ptr<Object>(new Sequence(seq));
 }
 
 }

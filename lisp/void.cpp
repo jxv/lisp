@@ -1,5 +1,7 @@
 #include "void.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
@@ -13,14 +15,14 @@ Type Void::type() const
     return Type::Void;
 }
     
-bool Void::eq(std::shared_ptr<Object> obj) const
+bool Void::eq(shared_ptr<Object> obj) const
 {
     return Void::get() == obj;
 }
 
-std::shared_ptr<Void> Void::get()
+shared_ptr<Void> Void::get()
 {
-    static auto singleton = std::shared_ptr<Void>(new Void);
+    static auto singleton = shared_ptr<Void>(new Void);
     return singleton;
 }
 

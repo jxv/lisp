@@ -13,7 +13,7 @@ using std::unique_ptr;
 namespace lisp
 {
 
-VectorList::VectorList(std::vector<std::shared_ptr<Object>> &items)
+VectorList::VectorList(std::vector<shared_ptr<Object>> &items)
     : m_items(items)
 {
     if (items.size() < 1)

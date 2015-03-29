@@ -20,6 +20,16 @@ private:
     Empty();
 };
 
+class EmptyIterator : public Iterator
+{
+public:
+    EmptyIterator();
+    void next();
+    bool is_done() const;
+    bool is_last() const;
+    std::shared_ptr<Object> get() const;
+};
+
 }
 
 #endif // LISP_EMPTY_H

@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
@@ -16,7 +18,7 @@ const std::string &Object::ud_type() const
     throw Error("not a user-defined type");
 }
 
-std::shared_ptr<Object> Object::eval(std::shared_ptr<Environment>)
+shared_ptr<Object> Object::eval(shared_ptr<Environment>)
 {
     std::string msg = "can't eval: \'";
     std::ostringstream oss;
@@ -26,12 +28,12 @@ std::shared_ptr<Object> Object::eval(std::shared_ptr<Environment>)
     throw Error(msg);
 }
 
-std::shared_ptr<Object> Object::apply(std::shared_ptr<Object>)
+shared_ptr<Object> Object::apply(shared_ptr<Object>)
 {
     throw Error::with_object("can't apply: ", *this);
 }
 
-std::shared_ptr<Object> eval(std::shared_ptr<Environment> env, std::shared_ptr<Object> obj)
+shared_ptr<Object> eval(shared_ptr<Environment> env, shared_ptr<Object> obj)
 {
     auto type = obj->type();
     if (type != Type::Symbol && type != Type::List && type != Type::Sequence && type != Type::Quote)
@@ -46,7 +48,7 @@ std::ostream &operator <<(std::ostream &os, const Object &obj)
     obj.write(os);
 }
 
-std::ostream &operator <<(std::ostream &os, const std::shared_ptr<Object> obj)
+std::ostream &operator <<(std::ostream &os, const shared_ptr<Object> obj)
 {
     os << *obj;
 }

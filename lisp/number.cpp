@@ -1,6 +1,8 @@
 #include "number.h"
 #include "error.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
@@ -9,7 +11,7 @@ I32::I32(int v)
 {
 }
 
-bool I32::eq(std::shared_ptr<Object> obj) const
+bool I32::eq(shared_ptr<Object> obj) const
 {
     try
     {
@@ -21,7 +23,7 @@ bool I32::eq(std::shared_ptr<Object> obj) const
     return false;
 }
 
-std::shared_ptr<I32> I32::to(std::shared_ptr<Object> obj)
+shared_ptr<I32> I32::to(shared_ptr<Object> obj)
 {
     if (obj->type() != Type::I32)
     {
@@ -30,7 +32,7 @@ std::shared_ptr<I32> I32::to(std::shared_ptr<Object> obj)
     return std::dynamic_pointer_cast<I32>(obj);
 }
 
-int I32::value(std::shared_ptr<Object> obj)
+int I32::value(shared_ptr<Object> obj)
 {
     return std::static_pointer_cast<Number>(I32::to(obj))->value();
 }
@@ -40,7 +42,7 @@ F32::F32(float v)
 {
 }
 
-bool F32::eq(std::shared_ptr<Object> obj) const
+bool F32::eq(shared_ptr<Object> obj) const
 {
     try
     {
@@ -52,7 +54,7 @@ bool F32::eq(std::shared_ptr<Object> obj) const
     return false;
 }
 
-std::shared_ptr<F32> F32::to(std::shared_ptr<Object> obj)
+shared_ptr<F32> F32::to(shared_ptr<Object> obj)
 {
     if (obj->type() != Type::F32)
     {
@@ -61,7 +63,7 @@ std::shared_ptr<F32> F32::to(std::shared_ptr<Object> obj)
     return std::dynamic_pointer_cast<F32>(obj);
 }
 
-float F32::value(std::shared_ptr<Object> obj)
+float F32::value(shared_ptr<Object> obj)
 {
     return std::static_pointer_cast<Number>(F32::to(obj))->value();
 }

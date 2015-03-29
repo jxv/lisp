@@ -2,10 +2,12 @@
 #include "error.h"
 #include "void.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
-Sequence::Sequence(std::vector<std::shared_ptr<Object> > &statements)
+Sequence::Sequence(std::vector<shared_ptr<Object> > &statements)
     : m_statements(statements)
 {
 }
@@ -24,7 +26,7 @@ void Sequence::write(std::ostream &os) const
     os << ")";
 }
 
-bool Sequence::eq(std::shared_ptr<Object> obj) const
+bool Sequence::eq(shared_ptr<Object> obj) const
 {
     return false;
 }
@@ -34,9 +36,9 @@ Type Sequence::type() const
     return Type::Sequence;
 }
 
-std::shared_ptr<Object> Sequence::eval(std::shared_ptr<Environment> env)
+shared_ptr<Object> Sequence::eval(shared_ptr<Environment> env)
 {
-    std::shared_ptr<Object> last = Void::get();
+    shared_ptr<Object> last = Void::get();
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
         last = lisp::eval(env, *it);
@@ -44,7 +46,7 @@ std::shared_ptr<Object> Sequence::eval(std::shared_ptr<Environment> env)
     return last;
 }
     
-std::shared_ptr<Sequence> Sequence::to(std::shared_ptr<Object> obj)
+shared_ptr<Sequence> Sequence::to(shared_ptr<Object> obj)
 {
     if (obj->type() != Type::Sequence)
     {

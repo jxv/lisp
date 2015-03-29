@@ -8,6 +8,8 @@
 #include "function.h"
 #include "nil.h"
 
+using std::shared_ptr;
+
 namespace lisp
 {
 
@@ -31,7 +33,7 @@ Type List::type() const
     return Type::List;
 }
 
-bool List::eq(std::shared_ptr<Object> obj) const
+bool List::eq(shared_ptr<Object> obj) const
 {
     try
     {
@@ -47,7 +49,7 @@ bool List::eq(std::shared_ptr<Object> obj) const
     return false;
 }
 
-std::shared_ptr<List> List::to(std::shared_ptr<Object> obj)
+shared_ptr<List> List::to(shared_ptr<Object> obj)
 {
     if (obj->type() != Type::List)
     {
@@ -56,7 +58,7 @@ std::shared_ptr<List> List::to(std::shared_ptr<Object> obj)
     return std::dynamic_pointer_cast<List>(obj);
 }
 
-std::shared_ptr<Object> cons(std::shared_ptr<Object> car, std::shared_ptr<Object> cdr)
+shared_ptr<Object> cons(shared_ptr<Object> car, shared_ptr<Object> cdr)
 {
     if (cdr->type() != Type::List)
     {
@@ -64,17 +66,17 @@ std::shared_ptr<Object> cons(std::shared_ptr<Object> car, std::shared_ptr<Object
     }
     if (cdr == Empty::get())
     {
-        std::list<std::shared_ptr<Object>> items = { car };
-        return std::shared_ptr<LinkedList>(new LinkedList(items));
+        std::list<shared_ptr<Object>> items = { car };
+        return shared_ptr<LinkedList>(new LinkedList(items));
     }
-    std::list<std::shared_ptr<Object>> items;
+    std::list<shared_ptr<Object>> items;
     auto list = std::dynamic_pointer_cast<lisp::List>(cdr);
     items.push_front(car);
     for (auto it = list->iterator(); !it->is_done(); it->next())
     {
         items.push_back(it->get());
     }
-    return std::shared_ptr<LinkedList>(new LinkedList(items));
+    return shared_ptr<LinkedList>(new LinkedList(items));
 }
 
 }
